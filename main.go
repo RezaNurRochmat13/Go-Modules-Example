@@ -15,7 +15,10 @@ func main() {
 
 func RunServer() {
 	routers := echo.New()
-	routers.GET("/users", handler.GetAllUsers)
+	groupingRoutes := routers.Group("/public/api/v1/")
+
+	groupingRoutes.GET("users", handler.GetAllUsers)
+	groupingRoutes.GET("users/:UsersParam", handler.GetDetailUsers)
 
 	routers.Use(middleware.Logger())
 

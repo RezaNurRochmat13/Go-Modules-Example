@@ -1,0 +1,5 @@
+[postgres]
+PostgresHost = "localhost"
+PostgresUsername = "rejakadmin"
+PostgresPassword = "rejakadmin"
+PostgresDatabaseName = "blogs_development"
