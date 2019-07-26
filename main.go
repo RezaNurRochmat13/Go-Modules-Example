@@ -16,9 +16,10 @@ func RunServer() {
 	routers := gin.Default()
 	groupingRoutes := routers.Group("/public/api/v1/")
 	{
-		groupingRoutes.GET("users", handler.GetAllUsers)
-		groupingRoutes.GET("users/:UsersParam", handler.GetDetailUsers)
-		groupingRoutes.POST("users", handler.CreateNewUsers)
+		groupingRoutes.GET("users", handler.GetAllUserHandler)
+		groupingRoutes.GET("users/:UsersParam", handler.GetDetailUserHandler)
+		groupingRoutes.POST("users", handler.CreateNewUserHandler)
+		groupingRoutes.PUT("users/:UsersParam", handler.UpdateUserHandler)
 	}
 
 	routers.Run(":8080")

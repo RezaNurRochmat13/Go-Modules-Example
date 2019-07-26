@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllUsers(ctx *gin.Context) {
+func GetAllUserHandler(ctx *gin.Context) {
 	findAllUserService, errorHandlerService := service.FetchAllUsers()
 
 	if errorHandlerService != nil {
@@ -33,7 +33,7 @@ func GetAllUsers(ctx *gin.Context) {
 
 }
 
-func GetDetailUsers(ctx *gin.Context) {
+func GetDetailUserHandler(ctx *gin.Context) {
 	UsersParam := ctx.Param("UsersParam")
 	convertUsersID, _ := strconv.Atoi(UsersParam)
 
@@ -54,7 +54,7 @@ func GetDetailUsers(ctx *gin.Context) {
 	})
 }
 
-func CreateNewUsers(ctx *gin.Context) {
+func CreateNewUserHandler(ctx *gin.Context) {
 	var userPayload dao.CreateNewUser
 
 	ctx.BindJSON(&userPayload)
@@ -72,4 +72,48 @@ func CreateNewUsers(ctx *gin.Context) {
 		"message": "User created",
 		"created": userPayload,
 	})
+}
+
+func UpdateUserHandler(ctx *gin.Context) {
+	var (
+		userPayload dao.UpdateUser
+		UsersParam  = ctx.Param("UsersParam")
+	)
+
+	convertUsersID, _ := strconv.Atoi(UsersParam)
+
+	ctx.BindJSON(&userPayload)
+
+	userPayload.CreatedAt = time.Now()
+	userPayload.UpdatedAt = time.Now()
+
+	findDetailUserService, errorHandlerService := service.FetchUserByID(convertUsersID)
+
+	if errorHandlerService != nil {
+		log.Printf("Error when get service %s", errorHandlerService)
+	}
+
+	if findDetailUserService == nil {
+		ctx.JSON(200, gin.H{
+			"message": "Data not found",
+		})
+	} else {
+		updateUserProcess(userPayload, convertUsersID, ctx)
+	}
+
+}
+
+func updateUserProcess(updateUserPayload dao.UpdateUser, convertedUserID int, ctx *gin.Context) {
+	errorHandlerUpdateUserService := service.UpdateUser(convertedUserID, updateUserPayload)
+
+	if errorHandlerUpdateUserService != nil {
+		ctx.JSON(500, gin.H{
+			"error": errorHandlerUpdateUserService,
+		})
+	} else {
+		ctx.JSON(200, gin.H{
+			"message":        "User updated successfully",
+			"updated_record": updateUserPayload,
+		})
+	}
 }

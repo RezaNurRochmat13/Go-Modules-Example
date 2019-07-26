@@ -120,3 +120,81 @@ func SaveNewUser(createNewUserPayload dao.CreateNewUser) error {
 
 	return nil
 }
+
+func UpdateUser(userID int, updateUserPayload dao.UpdateUser) error {
+	databaseConfig := resources.DatabaseConnectionPostgres()
+
+	defer databaseConfig.Close()
+
+	updateUserRepository := repository.UpdateUser()
+
+	initTransaction, errorHandlerTransaction := databaseConfig.Begin()
+
+	if errorHandlerTransaction != nil {
+		log.Printf("Error when init transaction %s", errorHandlerTransaction)
+	}
+
+	defer initTransaction.Rollback()
+
+	stmtPrepareUpdateUser, errorHandlerPrepareStmt := databaseConfig.Prepare(updateUserRepository)
+
+	if errorHandlerPrepareStmt != nil {
+		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+	}
+
+	_, errorHandlerExecQuery := stmtPrepareUpdateUser.Exec(
+		updateUserPayload.Name,
+		updateUserPayload.Address,
+		updateUserPayload.PhoneNumber,
+		updateUserPayload.CreatedAt,
+		updateUserPayload.UpdatedAt,
+		userID)
+
+	if errorHandlerExecQuery != nil {
+		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+	}
+
+	errorHandlerCommitTrans := initTransaction.Commit()
+
+	if errorHandlerCommitTrans != nil {
+		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+	}
+
+	return nil
+}
+
+func DeleteUser(userID int) error {
+	databaseConfig := resources.DatabaseConnectionPostgres()
+
+	defer databaseConfig.Close()
+
+	deleteUserRepository := repository.DeleteUser()
+
+	initTransaction, errorHandlerTransaction := databaseConfig.Begin()
+
+	if errorHandlerTransaction != nil {
+		log.Printf("Error when init transaction %s", errorHandlerTransaction)
+	}
+
+	defer initTransaction.Rollback()
+
+	stmtPrepareDeleteUser, errorHandlerPrepareStmt := databaseConfig.Prepare(deleteUserRepository)
+
+	if errorHandlerPrepareStmt != nil {
+		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+	}
+
+	_, errorHandlerExecQuery := stmtPrepareDeleteUser.Exec(userID)
+
+	if errorHandlerExecQuery != nil {
+		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+	}
+
+	errorHandlerCommitTrans := initTransaction.Commit()
+
+	if errorHandlerCommitTrans != nil {
+		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+	}
+
+	return nil
+}
