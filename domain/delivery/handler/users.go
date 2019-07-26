@@ -117,3 +117,36 @@ func updateUserProcess(updateUserPayload dao.UpdateUser, convertedUserID int, ct
 		})
 	}
 }
+
+func DeleteUserHandler(ctx *gin.Context) {
+	UsersParam := ctx.Param("UsersParam")
+	convertUsersID, _ := strconv.Atoi(UsersParam)
+
+	findDetailUserService, errorHandlerService := service.FetchUserByID(convertUsersID)
+
+	if errorHandlerService != nil {
+		log.Printf("Error when get service %s", errorHandlerService)
+	}
+
+	if findDetailUserService == nil {
+		ctx.JSON(200, gin.H{
+			"message": "Data not found",
+		})
+	} else {
+		deleteUserProcess(convertUsersID, ctx)
+	}
+}
+
+func deleteUserProcess(userID int, ctx *gin.Context) {
+	errorHandlerDeleteService := service.DeleteUser(userID)
+
+	if errorHandlerDeleteService != nil {
+		ctx.JSON(500, gin.H{
+			"error": errorHandlerDeleteService,
+		})
+	} else {
+		ctx.JSON(200, gin.H{
+			"message": "User deleted successfully",
+		})
+	}
+}

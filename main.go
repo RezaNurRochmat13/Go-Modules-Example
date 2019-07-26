@@ -20,6 +20,7 @@ func RunServer() {
 		groupingRoutes.GET("users/:UsersParam", handler.GetDetailUserHandler)
 		groupingRoutes.POST("users", handler.CreateNewUserHandler)
 		groupingRoutes.PUT("users/:UsersParam", handler.UpdateUserHandler)
+		groupingRoutes.DELETE("users/:UsersParam", handler.DeleteUserHandler)
 	}
 
 	routers.Run(":8080")
