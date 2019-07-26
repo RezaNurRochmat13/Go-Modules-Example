@@ -25,13 +25,13 @@ List steps to running this project on local machine
 
 ## Go Modules Cheatsheet
 - cd direectory outside GOPATH # ex : ~/.blabla-workspace
-- go mod init <module-name> - Init your module
-- go get <package-downloads> - Command for download your dependency and add in your projects
-- go list -m all — View final versions that will be used in a build for all direct and indirect dependencies
-- go list -u -m all — View available minor and patch upgrades for all direct and indirect dependencies
-- go get -u or go get -u=patch — Update all direct and indirect dependencies to latest minor or patch upgrades (pre-releases are ignored)
-- go build ./... or go test ./... — Build or test all packages in the module when run from the module root directory
-- go mod tidy — Prune any no-longer-needed dependencies from go.mod and add any dependencies needed for other combinations of OS, architecture, and build tags
+- `go mod init <module-name>` - Init your module
+- `go get <package-downloads>` - Command for download your dependency and add in your projects
+- `go list -m all` — View final versions that will be used in a build for all direct and indirect dependencies
+- `go list -u -m all` — View available minor and patch upgrades for all direct and indirect dependencies
+- `go get -u` or `go get -u=patch` — Update all direct and indirect dependencies to latest minor or patch upgrades (pre-releases are ignored)
+- `go build ./...` or `go test ./...` — Build or test all packages in the module when run from the module root directory
+- `go mod tidy` — Prune any no-longer-needed dependencies from go.mod and add any dependencies needed for other combinations of OS, architecture, and build tags
 
 More documentation about go modules, you can visit this [https://github.com/golang/go/wiki/Modules]
 
