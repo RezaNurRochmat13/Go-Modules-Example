@@ -1,14 +1,16 @@
 package handler
 
 import (
+	"learning-gomod/domain/dao"
 	"learning-gomod/domain/service"
 	"log"
 	"strconv"
+	"time"
 
-	"github.com/labstack/echo"
+	"github.com/gin-gonic/gin"
 )
 
-func GetAllUsers(ctx echo.Context) error {
+func GetAllUsers(ctx *gin.Context) {
 	findAllUserService, errorHandlerService := service.FetchAllUsers()
 
 	if errorHandlerService != nil {
@@ -16,14 +18,14 @@ func GetAllUsers(ctx echo.Context) error {
 	}
 
 	if findAllUserService == nil {
-		return ctx.JSON(200, echo.Map{
+		ctx.JSON(200, gin.H{
 			"total": len(findAllUserService),
 			"count": len(findAllUserService),
 			"data":  []int{},
 		})
 	}
 
-	return ctx.JSON(200, echo.Map{
+	ctx.JSON(200, gin.H{
 		"total": len(findAllUserService),
 		"count": len(findAllUserService),
 		"data":  findAllUserService,
@@ -31,7 +33,7 @@ func GetAllUsers(ctx echo.Context) error {
 
 }
 
-func GetDetailUsers(ctx echo.Context) error {
+func GetDetailUsers(ctx *gin.Context) {
 	UsersParam := ctx.Param("UsersParam")
 	convertUsersID, _ := strconv.Atoi(UsersParam)
 
@@ -42,12 +44,32 @@ func GetDetailUsers(ctx echo.Context) error {
 	}
 
 	if findDetailUserService == nil {
-		return ctx.JSON(200, echo.Map{
+		ctx.JSON(200, gin.H{
 			"data": []int{},
 		})
 	}
 
-	return ctx.JSON(200, echo.Map{
+	ctx.JSON(200, gin.H{
 		"data": findDetailUserService,
+	})
+}
+
+func CreateNewUsers(ctx *gin.Context) {
+	var userPayload dao.CreateNewUser
+
+	ctx.BindJSON(&userPayload)
+
+	userPayload.CreatedAt = time.Now()
+	userPayload.UpdatedAt = time.Now()
+
+	errorHandlerService := service.SaveNewUser(userPayload)
+
+	if errorHandlerService != nil {
+		ctx.JSON(500, errorHandlerService.Error())
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "User created",
+		"created": userPayload,
 	})
 }

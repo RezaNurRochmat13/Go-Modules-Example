@@ -9,7 +9,7 @@ import (
 )
 
 func FetchAllUsers() ([]dao.ListUser, error) {
-	databaseConfig := resources.DatabaseConnection()
+	databaseConfig := resources.DatabaseConnectionPostgres()
 
 	defer databaseConfig.Close()
 
@@ -44,7 +44,7 @@ func FetchAllUsers() ([]dao.ListUser, error) {
 }
 
 func FetchUserByID(userID int) ([]dao.DetailUser, error) {
-	databaseConfig := resources.DatabaseConnection()
+	databaseConfig := resources.DatabaseConnectionPostgres()
 
 	defer databaseConfig.Close()
 
@@ -78,4 +78,45 @@ func FetchUserByID(userID int) ([]dao.DetailUser, error) {
 	}
 
 	return resultDetailUser, nil
+}
+
+func SaveNewUser(createNewUserPayload dao.CreateNewUser) error {
+	databaseConfig := resources.DatabaseConnectionPostgres()
+
+	defer databaseConfig.Close()
+
+	saveNewUserRepository := repository.SaveUser()
+
+	initTransaction, errorHandlerTransaction := databaseConfig.Begin()
+
+	if errorHandlerTransaction != nil {
+		log.Printf("Error when init transaction %s", errorHandlerTransaction)
+	}
+
+	defer initTransaction.Rollback()
+
+	stmtPrepareNewUser, errorHandlerPrepareStmt := databaseConfig.Prepare(saveNewUserRepository)
+
+	if errorHandlerPrepareStmt != nil {
+		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+	}
+
+	_, errorHandlerExecQuery := stmtPrepareNewUser.Exec(
+		createNewUserPayload.Name,
+		createNewUserPayload.Address,
+		createNewUserPayload.PhoneNumber,
+		createNewUserPayload.CreatedAt,
+		createNewUserPayload.UpdatedAt)
+
+	if errorHandlerExecQuery != nil {
+		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+	}
+
+	errorHandlerCommitTrans := initTransaction.Commit()
+
+	if errorHandlerCommitTrans != nil {
+		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+	}
+
+	return nil
 }

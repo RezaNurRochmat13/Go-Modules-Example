@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func DatabaseConnection() *sql.DB {
+func DatabaseConnectionPostgres() *sql.DB {
 	viper.SetConfigName("postgres-dev")
 	viper.AddConfigPath("environment/postgres")
 
@@ -37,7 +37,7 @@ func DatabaseConnection() *sql.DB {
 
 	databaseConnectionConfiguration.SetMaxOpenConns(50)
 	databaseConnectionConfiguration.SetMaxIdleConns(50)
-	databaseConnectionConfiguration.SetConnMaxLifetime(100 * time.Millisecond)
+	databaseConnectionConfiguration.SetConnMaxLifetime(50 * time.Millisecond)
 
 	return databaseConnectionConfiguration
 }

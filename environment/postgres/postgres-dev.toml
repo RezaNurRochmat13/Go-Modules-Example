@@ -1,5 +1,5 @@
 [postgres]
-PostgresHost = "localhost"
+PostgresHost = "localhost:5432"
 PostgresUsername = "rejakadmin"
 PostgresPassword = "rejakadmin"
 PostgresDatabaseName = "blogs_development"

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"learning-gomod/domain/delivery/handler"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -14,13 +13,14 @@ func main() {
 }
 
 func RunServer() {
-	routers := echo.New()
+	routers := gin.Default()
 	groupingRoutes := routers.Group("/public/api/v1/")
+	{
+		groupingRoutes.GET("users", handler.GetAllUsers)
+		groupingRoutes.GET("users/:UsersParam", handler.GetDetailUsers)
+		groupingRoutes.POST("users", handler.CreateNewUsers)
+	}
 
-	groupingRoutes.GET("users", handler.GetAllUsers)
-	groupingRoutes.GET("users/:UsersParam", handler.GetDetailUsers)
+	routers.Run(":8080")
 
-	routers.Use(middleware.Logger())
-
-	routers.Logger.Fatal(routers.Start(":8080"))
 }

@@ -16,3 +16,8 @@ func FindUserById() string {
 		"FROM users " +
 		"WHERE users.id = $1"
 }
+
+func SaveUser() string {
+	return "INSERT INTO users(name, address, phone_number, created_at, updated_at) " +
+		"VALUES ($1, $2, $3, $4, $5)"
+}
