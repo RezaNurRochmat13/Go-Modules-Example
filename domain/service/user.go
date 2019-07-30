@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"learning-gomod/domain/dao"
 	"learning-gomod/domain/repository"
 	"learning-gomod/resources"
@@ -24,6 +23,7 @@ func FetchAllUsers() ([]dao.ListUser, error) {
 
 	if errorHandlerQuery != nil {
 		log.Printf("Error when executing query %s", errorHandlerQuery)
+		return nil, errorHandlerQuery
 	}
 
 	for queryAllUser.Next() {
@@ -35,6 +35,7 @@ func FetchAllUsers() ([]dao.ListUser, error) {
 
 		if errorScanHandler != nil {
 			log.Printf("Error scan data %s", errorScanHandler)
+			return nil, errorScanHandler
 		}
 
 		resultAllUser = append(resultAllUser, daoMapperUser)
@@ -59,6 +60,7 @@ func FetchUserByID(userID int) ([]dao.DetailUser, error) {
 
 	if errorHandlerQuery != nil {
 		log.Printf("Error when execute query %s", errorHandlerQuery)
+		return nil, errorHandlerQuery
 	}
 
 	for queryDetailUser.Next() {
@@ -70,9 +72,8 @@ func FetchUserByID(userID int) ([]dao.DetailUser, error) {
 
 		if errorHandlerScan != nil {
 			log.Printf("Error when scan value %s", errorHandlerScan)
+			return nil, errorHandlerScan
 		}
-
-		fmt.Println(daoMapperUser)
 
 		resultDetailUser = append(resultDetailUser, daoMapperUser)
 	}
@@ -91,6 +92,7 @@ func SaveNewUser(createNewUserPayload dao.CreateNewUser) error {
 
 	if errorHandlerTransaction != nil {
 		log.Printf("Error when init transaction %s", errorHandlerTransaction)
+		return errorHandlerTransaction
 	}
 
 	defer initTransaction.Rollback()
@@ -99,6 +101,8 @@ func SaveNewUser(createNewUserPayload dao.CreateNewUser) error {
 
 	if errorHandlerPrepareStmt != nil {
 		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+		initTransaction.Rollback()
+		return errorHandlerPrepareStmt
 	}
 
 	_, errorHandlerExecQuery := stmtPrepareNewUser.Exec(
@@ -110,12 +114,16 @@ func SaveNewUser(createNewUserPayload dao.CreateNewUser) error {
 
 	if errorHandlerExecQuery != nil {
 		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+		initTransaction.Rollback()
+		return errorHandlerExecQuery
 	}
 
 	errorHandlerCommitTrans := initTransaction.Commit()
 
 	if errorHandlerCommitTrans != nil {
 		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+		initTransaction.Rollback()
+		return errorHandlerCommitTrans
 	}
 
 	return nil
@@ -132,6 +140,7 @@ func UpdateUser(userID int, updateUserPayload dao.UpdateUser) error {
 
 	if errorHandlerTransaction != nil {
 		log.Printf("Error when init transaction %s", errorHandlerTransaction)
+		return errorHandlerTransaction
 	}
 
 	defer initTransaction.Rollback()
@@ -140,6 +149,8 @@ func UpdateUser(userID int, updateUserPayload dao.UpdateUser) error {
 
 	if errorHandlerPrepareStmt != nil {
 		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+		initTransaction.Rollback()
+		return errorHandlerPrepareStmt
 	}
 
 	_, errorHandlerExecQuery := stmtPrepareUpdateUser.Exec(
@@ -152,12 +163,16 @@ func UpdateUser(userID int, updateUserPayload dao.UpdateUser) error {
 
 	if errorHandlerExecQuery != nil {
 		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+		initTransaction.Rollback()
+		return errorHandlerExecQuery
 	}
 
 	errorHandlerCommitTrans := initTransaction.Commit()
 
 	if errorHandlerCommitTrans != nil {
 		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+		initTransaction.Rollback()
+		return errorHandlerCommitTrans
 	}
 
 	return nil
@@ -182,18 +197,24 @@ func DeleteUser(userID int) error {
 
 	if errorHandlerPrepareStmt != nil {
 		log.Printf("Error when prepared stmt %s", errorHandlerPrepareStmt)
+		initTransaction.Rollback()
+		return errorHandlerPrepareStmt
 	}
 
 	_, errorHandlerExecQuery := stmtPrepareDeleteUser.Exec(userID)
 
 	if errorHandlerExecQuery != nil {
 		log.Printf("Error when inserting db %s", errorHandlerExecQuery)
+		initTransaction.Rollback()
+		return errorHandlerExecQuery
 	}
 
 	errorHandlerCommitTrans := initTransaction.Commit()
 
 	if errorHandlerCommitTrans != nil {
 		log.Printf("Error transaction we'll roolback %s", errorHandlerCommitTrans)
+		initTransaction.Rollback()
+		return errorHandlerCommitTrans
 	}
 
 	return nil
